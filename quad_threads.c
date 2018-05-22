@@ -1,7 +1,24 @@
 #include<stdio.h>
 #include<string.h>
 #include<stdlib.h>
+#include<pthread.h>
 #define size 16000
+
+int partialSum (int **matrix) {
+    int columns = size/2, rows = size, sum=0;
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < columns; j++) {
+            matrix[i][j] *= matrix[i][i];
+        }
+    }
+    for(int i = 0; i < rows; i++) {
+        for(int j = 0; j < columns; j++) {
+            sum += matrix[i][j];
+        }
+    }
+    
+    return sum;
+}
 
 int main(){
 
@@ -49,6 +66,11 @@ int main(){
     //     }
     //     i++;
     // }
+
+    pthread_t first_thread, second_thread;
+    pthread_create(&first_thread, NULL, partialSum, matrix);
+    pthread_join(first_thread, NULL);
+    printf("After Thread\n");
 
 
     return 0;
