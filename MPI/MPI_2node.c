@@ -88,7 +88,7 @@ int main(int argc, char** argv){
         int *matrixArray = matrixToArray(&matrix);
         MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
         int columns = size/2, rows = size, start = 0;
-        printf("Esse ");
+        printf("Esse é o nó %d calculando metade da matriz", proc_index());
         for(int i = 0; i < rows; i++) {
             for(int j = start; j < start + columns; j++) {
                 matrix[i][j] *= matrix[i][i];

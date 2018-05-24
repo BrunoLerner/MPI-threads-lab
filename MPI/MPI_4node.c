@@ -5,13 +5,6 @@
 #include "mpi.h"
 #define size 16000
 
-
-int proc_index(){
-    int index;
-    MPI_Comm_rank(MPI_COMM_WORLD, &index);
-    return index;
-}
-
 int ** getMatrix() {
     // Alocando espaço pra matriz
     int **matrix;
@@ -80,80 +73,92 @@ int ** arrayToMatrix(int **matrixArray) {
 int main(int argc, char** argv){
     MPI_Init(&argc, &argv);
 
-    int localSum = 0, globalSum;
+    int localSum = 0, globalSum, myRank;
+    MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
-    if(proc_index() == 0) {
+    if(myRank == 0) {
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
         int **matrix = getMatrix();
         int *matrixArray = matrixToArray(&matrix);
+        int columns = size/2, rows = size/2, rowStart = 0, columnStart = 0;
+        printf("Esse é o nó %d calculando um quarto da matriz e a distribuindo", myRank);
+
         MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
-        int columns = size/2, rows = size, start = 0;
-        printf("Esse ");
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= matrix[i][i];
             }
         }
-
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }           
+        }       
     }
-    else if(proc_index() == 1) {
+    else if(myRank == 1) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
         MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(&matrixArray);
-        int columns = size/2, rows = size, start = size/2;
+        int columns = size/2, rows = size/2, rowStart = 0, columnStart = size/2;
+        printf("Esse é o nó %d calculando um quarto da matriz", myRank);
 
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
-                matrix[i][j] *= matrix[i][i];
-            }
+        int *diagonal = malloc(size * sizeof(int));
+        for (int i =0; i < size; i++) {
+            diagonal[i] = matrix[i][i];
         }
 
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
+                matrix[i][j] *= diagonal[i];
+            }
+        }
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
         }  
     }
-    else if(proc_index() == 2) {
+    else if(myRank == 2) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
         MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(&matrixArray);
-        int columns = size/2, rows = size, start = size/2;
+        int columns = size/2, rows = size/2, rowStart = size/2, columnStart = 0;
+        printf("Esse é o nó %d calculando um quarto da matriz", myRank);
 
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
-                matrix[i][j] *= matrix[i][i];
-            }
+        int *diagonal = malloc(size * sizeof(int));
+        for (int i =0; i < size; i++) {
+            diagonal[i] = matrix[i][i];
         }
 
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
+                matrix[i][j] *= diagonal[i];
+            }
+        }
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }  
+        }   
     }
-    else if(proc_index() == 3) {
+    else if(myRank == 3) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
         MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(&matrixArray);
-        int columns = size/2, rows = size, start = size/2;
+        int columns = size/2, rows = size/2, rowStart = size/2, columnStart = size/2;
+        printf("Esse é o nó %d calculando um quarto da matriz", myRank);
 
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= matrix[i][i];
             }
         }
-
-        for(int i = 0; i < rows; i++) {
-            for(int j = start; j < start + columns; j++) {
+        for (int i = rowStart; i < rowStart + rows; i++) {
+            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }  
+        }   
     }
 
 
@@ -162,7 +167,7 @@ int main(int argc, char** argv){
              MPI_COMM_WORLD);
 
     // Print the result
-    if (proc_index() == 0) {
+    if (myRank == 0) {
         printf("A soma dos elementos da matriz resultante é = %d\n", global_sum));
     }
 
