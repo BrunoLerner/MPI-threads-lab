@@ -8,21 +8,18 @@
 
 typedef struct threads_args {
     int index;
-    int ** matrix;
 } pthread_args;
 
-int sum[2];
+int sum[2], **matrix;
 
 void * partialSum (void *matrixAndIndex) {
     pthread_args * args = (pthread_args *) matrixAndIndex;
     int index = args->index;
-    int **matrix = args->matrix;
     int columns = size/2, rows = size, start = 0;
 
     if(index == 1) {
         start = size/2;
     } 
-
 
     for(int i = 0; i < rows; i++) {
         for(int j = start; j < columns; j++) {
@@ -36,10 +33,8 @@ void * partialSum (void *matrixAndIndex) {
     }
 }
 
-int main(){
-
+void getMatrix() {
     // Alocando espaço pra matriz
-    int **matrix, i, j;
     matrix = malloc(size * sizeof(int *));
     
     if(matrix == NULL) {
@@ -47,7 +42,7 @@ int main(){
         exit(1);
     }
 
-    for(i = 0; i < size; i++) {
+    for(int i = 0; i < size; i++) {
         matrix[i] = malloc(size * sizeof(int));
         if(matrix[i] == NULL) {
             printf("Out of memory\n");
@@ -55,8 +50,8 @@ int main(){
         }
     }
     // Gerando a matriz aleatoriamente
-    for(i = 0; i < size; i++) {
-        for(j = 0; j < size; j++) {
+    for(int i = 0; i < size; i++) {
+        for(int j = 0; j < size; j++) {
             matrix[i][j] = rand() % 2;
         }
     }
@@ -83,7 +78,10 @@ int main(){
     //     i++;
     // }
     // fclose(matrixFile)
+}
 
+int main(){
+    getMatrix();
     
     time_t before, after;
     pthread_t threads[nThreads];
@@ -91,10 +89,7 @@ int main(){
     before = time(NULL);
     for(int i = 0; i < nThreads; i++) {
         pthread_args matrixAndIndex;
-
-        matrixAndIndex.matrix = &matrix;
         matrixAndIndex.index = i;
-
         pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
     }
     
@@ -106,6 +101,7 @@ int main(){
     after = time(NULL);
 
     printf("The time was %d seconds", after - before);
+    free(matrix);
 
     return 0;
 }
