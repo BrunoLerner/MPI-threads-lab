@@ -5,19 +5,35 @@
 #define size 16000
 #define nThreads 4
 
-typedef struct threads_param {
+typedef struct threads_args {
     int index;
     int ** matrix;
-} param;
+    int * diagonal;
+} pthread_args;
 
-int *partialSum (void *matrixAndIndex) {
-    param *args = (param *) matrixAndIndex;
-    int index = args.index;
-    int **matrix = args.matrix;
-    int start = 0;
-    
-    
-    // return sum;
+int sum[2];
+
+void * partialSum (void *matrixAndIndex) {
+    pthread_args * args = (pthread_args *) matrixAndIndex;
+    int index = args->index;
+    int **matrix = args->matrix;
+    int columns = size/2, rows = size, start = 0;
+
+    if(index == 1) {
+        start = size/2;
+    } 
+
+
+    for(int i = 0; i < rows; i++) {
+        for(int j = start; j < columns; j++) {
+            matrix[i][j] *= matrix[i][i];
+        }
+    }
+    for(int i = 0; i < rows; i++) {
+        for(int j = start; j < columns; j++) {
+            sum[index] += matrix[i][j];
+        }
+    }
 }
 
 int main(){
@@ -66,25 +82,26 @@ int main(){
     //     }
     //     i++;
     // }
+    // fclose(matrixFile)
 
     
 
     pthread_t threads[nThreads];
 
     for(int i = 0; i < nThreads; i++) {
-        param matrixAndIndex;
+        pthread_args matrixAndIndex;
 
         matrixAndIndex.matrix = &matrix;
         matrixAndIndex.index = i;
 
-        pthread_create(threads[i], NULL, partialSum, &matrixAndIndex);
+        pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
     }
 
     for(int i = 0; i < nThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     
-    printf("After Thread\n");
+    printf("The sum of the final Matrix is \n", sum[0] + sum[1]);
 
 
     return 0;
