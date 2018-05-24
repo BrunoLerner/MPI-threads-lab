@@ -32,10 +32,6 @@ void * partialSum (void *matrixAndIndex) {
     for (int i = rowStart; i < rowStart + rows; i++) {
         for (int j = columnStart; j < columnStart + columns; j++) {
             matrix[i][j] *= diagonal[i];
-        }
-    }
-    for (int i = rowStart; i < rowStart + rows; i++) {
-        for (int j = columnStart; j < columnStart + columns; j++) {
             sum[index] += matrix[i][j];
         }
     }

@@ -26,10 +26,6 @@ void * partialSum (void *matrixAndIndex) {
     for(int i = 0; i < rows; i++) {
         for(int j = start; j < start + columns; j++) {
             matrix[i][j] *= matrix[i][i];
-        }
-    }
-    for(int i = 0; i < rows; i++) {
-        for(int j = start; j < start + columns; j++) {
             sum[index] += matrix[i][j];
         }
     }

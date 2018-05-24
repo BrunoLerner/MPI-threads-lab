@@ -88,13 +88,9 @@ int main(int argc, char** argv){
         for (int i = rowStart; i < rowStart + rows; i++) {
             for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= matrix[i][i];
-            }
-        }
-        for (int i = rowStart; i < rowStart + rows; i++) {
-            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }       
+        }
     }
     else if(myRank == 1) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
@@ -111,13 +107,9 @@ int main(int argc, char** argv){
         for (int i = rowStart; i < rowStart + rows; i++) {
             for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= diagonal[i];
-            }
-        }
-        for (int i = rowStart; i < rowStart + rows; i++) {
-            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }  
+        }
     }
     else if(myRank == 2) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
@@ -134,13 +126,9 @@ int main(int argc, char** argv){
         for (int i = rowStart; i < rowStart + rows; i++) {
             for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= diagonal[i];
-            }
-        }
-        for (int i = rowStart; i < rowStart + rows; i++) {
-            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }   
+        }
     }
     else if(myRank == 3) {
         matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
@@ -152,13 +140,9 @@ int main(int argc, char** argv){
         for (int i = rowStart; i < rowStart + rows; i++) {
             for (int j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= matrix[i][i];
-            }
-        }
-        for (int i = rowStart; i < rowStart + rows; i++) {
-            for (int j = columnStart; j < columnStart + columns; j++) {
                 localSum += matrix[i][j];
             }
-        }   
+        }
     }
 
 
