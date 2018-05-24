@@ -8,6 +8,7 @@
 
 struct thread_args {
     int index;
+    int ** matrix;
     int * diagonal;
 };
 
@@ -17,36 +18,34 @@ void * partialSum (void *matrixAndIndex) {
     struct thread_args * args = (struct thread_args *) matrixAndIndex;
     int index = args->index;
     int *diagonal = args->diagonal;
+    int **matrix = args->matrix;
     int columns = size/4, rows = size/4, rowStart = 0, columnStart = 0;
-    printf("This is thread number %d calculating half of the matrix.\n", index);
+    printf("Esse é o thread número %d calculando um quarto da matriz.\n", index);
 
-    if(index == 1) {
-        columnStart = size/4;
-    } 
-    else if (index == 2) {
-        rowStart = size/4;
-    }
+    if(index == 1) columnStart = size/4;   
+    else if (index == 2) rowStart = size/4;
     else if (index == 3) {
         rowStart = size/4;
         columnStart = size/4;
     }
 
 
-    for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < columns; j++) {
+    for(int i = rowStart; i < rowStart + rows; i++) {
+        for(int j = columnStart; j < columnStart + columns; j++) {
             matrix[rowStart + i/rows][columnStart + j%columns] *= diagonal[rowStart + i/rows];
         }
     }
-    for(int i = 0; i < rows; i++) {
-        for(int j = 0; j < columns; j++) {
+    for(int i = rowStart; i < rowStart + rows; i++) {
+        for(int j = columnStart; j < columnStart + columns; j++) {
             sum[index] += matrix[rowStart + i/rows][columnStart + j%columns];
         }
     }
+    printf("Thread número %d calculou %d.\n", index, sum[index]);
 }
 
-void getMatrix() {
+int ** getMatrix() {
     // Alocando espaço pra matriz
-    matrix = malloc(size * sizeof(int *));
+    int **matrix = malloc(size * sizeof(int *));
     
     if(matrix == NULL) {
         printf("Out of memory\n");
@@ -89,14 +88,14 @@ void getMatrix() {
     //     i++;
     // }
     // fclose(matrixFile)
+    return matrix;
 }
 
 int main(){
-    getMatrix();
+    int **matrix = getMatrix();
 
     pthread_t threads[nThreads];
-    int *diagonal;
-    diagonal = malloc(size * sizeof(int));
+    int *diagonal = malloc(size * sizeof(int));
 
     for(int i = 0; i < size ; i++) {
         diagonal[i] = matrix[i][i];
@@ -104,10 +103,12 @@ int main(){
     time_t before, after;
 
     before = time(NULL);
+
     struct thread_args * matrixAndIndex;
     for(int i = 0; i < nThreads; i++) {
         matrixAndIndex = malloc(sizeof(struct thread_args));
         matrixAndIndex->index = i;
+        matrixAndIndex->matrix = matrix;
         matrixAndIndex->diagonal = diagonal;
         pthread_create(&threads[i], NULL, partialSum, (void *) matrixAndIndex);
     }
@@ -116,7 +117,7 @@ int main(){
         pthread_join(threads[i], NULL);
     }
     
-    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1] + sum[2] + sum[3]);
+    printf("A soma da matriz final é %d \n", sum[0] + sum[1] + sum[2] + sum[3]);
     after = time(NULL);
 
     // printf("The time was %d seconds", after - before);

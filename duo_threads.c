@@ -19,11 +19,9 @@ void * partialSum (void *matrixAndIndex) {
     int **matrix= args->matrix;
     int columns = size/2, rows = size, start = 0;
 
-    printf("This is thread number %d calculating half of the matrix.\n", index);
+    printf("Esse é o thread número %d calculando uma metade da matriz.\n", index);
 
-    if(index == 1) {
-        start = size/2;
-    } 
+    if(index == 1) start = size/2;
 
     for(int i = 0; i < rows; i++) {
         for(int j = start; j < start + columns; j++) {
@@ -39,8 +37,7 @@ void * partialSum (void *matrixAndIndex) {
 
 int** getMatrix() {
     // Alocando espaço pra matriz
-    int **matrix;
-    matrix = malloc(size * sizeof(int *));
+    int **matrix = malloc(size * sizeof(int *));
     
     if(matrix == NULL) {
         printf("Out of memory\n");
@@ -88,8 +85,7 @@ int** getMatrix() {
 }
 
 int main(){
-    int **matrix;
-    matrix = getMatrix();
+    int **matrix = getMatrix();
     
     time_t before, after;
     pthread_t threads[nThreads];
