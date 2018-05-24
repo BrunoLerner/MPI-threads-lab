@@ -12,12 +12,6 @@ int proc_index(){
     return index;
 }
 
-int total_proc(){
-    int p;
-    MPI_Comm_size(MPI_COMM_WORLD, &p);
-    return p;
-}
-
 int ** getMatrix() {
     // Alocando espaço pra matriz
     int **matrix;

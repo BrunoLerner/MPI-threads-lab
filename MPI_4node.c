@@ -12,16 +12,9 @@ int proc_index(){
     return index;
 }
 
-int total_proc(){
-    int p;
-    MPI_Comm_size(MPI_COMM_WORLD, &p);
-    return p;
-}
-
-int **matrix;
-
-void getMatrix() {
+int ** getMatrix() {
     // Alocando espaço pra matriz
+    int **matrix;
     matrix = malloc(size * sizeof(int *));
     
     if(matrix == NULL) {
@@ -65,9 +58,10 @@ void getMatrix() {
     //     i++;
     // }
     // fclose(matrixFile)
+    return matrix;
 }
 
-int * normalizeMatrix(int **matrix) {
+int * matrixToArray(int **matrix) {
     int *matrixArray;
     for(int i = 0; i < size*size; i++) {
         matrixArray[i] = matrix[i/size][i%size];
@@ -75,26 +69,104 @@ int * normalizeMatrix(int **matrix) {
     return matrixArray;
 }
 
-int main(int argc, char** argv){
+int ** arrayToMatrix(int **matrixArray) {
+    int **matrix;
+    for(int i = 0; i < size*size; i++) {
+        matrix[i/size][i%size] = matrixArray[i];
+    }
+    return matrix;
+}
 
+int main(int argc, char** argv){
     MPI_Init(&argc, &argv);
+
+    int localSum = 0, globalSum;
 
     if(proc_index() == 0) {
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
-        getMatrix();
-        int *matrixArray = normalizeMatrix(&matrix);
+        int **matrix = getMatrix();
+        int *matrixArray = matrixToArray(&matrix);
         MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+        int columns = size/2, rows = size, start = 0;
+        printf("Esse ");
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                matrix[i][j] *= matrix[i][i];
+            }
+        }
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                localSum += matrix[i][j];
+            }
+        }           
     }
     else if(proc_index() == 1) {
-        matrixArray = (int*) malloc( SIZE/2*sizeof(int));
-		
-		for(i = 0; i < SIZE/2; i++) {
-			for(j = 0; j < SIZE; j++) {
-				MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-			}
-		}
+        matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
+        MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        int **matrix = arrayToMatrix(&matrixArray);
+        int columns = size/2, rows = size, start = size/2;
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                matrix[i][j] *= matrix[i][i];
+            }
+        }
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                localSum += matrix[i][j];
+            }
+        }  
+    }
+    else if(proc_index() == 2) {
+        matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
+        MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        int **matrix = arrayToMatrix(&matrixArray);
+        int columns = size/2, rows = size, start = size/2;
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                matrix[i][j] *= matrix[i][i];
+            }
+        }
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                localSum += matrix[i][j];
+            }
+        }  
+    }
+    else if(proc_index() == 3) {
+        matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
+        MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        int **matrix = arrayToMatrix(&matrixArray);
+        int columns = size/2, rows = size, start = size/2;
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                matrix[i][j] *= matrix[i][i];
+            }
+        }
+
+        for(int i = 0; i < rows; i++) {
+            for(int j = start; j < start + columns; j++) {
+                localSum += matrix[i][j];
+            }
+        }  
     }
 
+
+
+    MPI_Reduce(&local_sum, &global_sum, 1, MPI_FLOAT, MPI_SUM, 0,
+             MPI_COMM_WORLD);
+
+    // Print the result
+    if (proc_index() == 0) {
+        printf("A soma dos elementos da matriz resultante é = %d\n", global_sum));
+    }
+
+    
     MPI_Finalize();
     return 0;
 }
