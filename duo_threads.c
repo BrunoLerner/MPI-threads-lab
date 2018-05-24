@@ -85,9 +85,10 @@ int main(){
     // fclose(matrixFile)
 
     
-
+    time_t before, after;
     pthread_t threads[nThreads];
 
+    before = time(NULL);
     for(int i = 0; i < nThreads; i++) {
         pthread_args matrixAndIndex;
 
@@ -96,13 +97,15 @@ int main(){
 
         pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
     }
-
+    
     for(int i = 0; i < nThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     
     printf("The sum of the final Matrix is \n", sum[0] + sum[1]);
+    after = time(NULL);
 
+    printf("The time was %d seconds", after - before);
 
     return 0;
 }

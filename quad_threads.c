@@ -103,7 +103,9 @@ int main(){
     for(int i = 0; i < size ; i++) {
         diagonal[i] = matrix[i][i];
     }
+    time_t before, after;
 
+    before = time(NULL);
     for(int i = 0; i < nThreads; i++) {
         pthread_args matrixAndIndex;
 
@@ -119,6 +121,9 @@ int main(){
     }
     
     printf("The sum of the final Matrix is \n", sum[0] + sum[1] + sum[2] + sum[3]);
+    after = time(NULL);
+
+    printf("The time was %d seconds", after - before);
     
     free(matrix);
     free(diagonal);

@@ -50,6 +50,8 @@ int main(){
     //     }
     //     i++;
     // }
+    //fclose(matrixFile)
+
 
 
     return 0;
