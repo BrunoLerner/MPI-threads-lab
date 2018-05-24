@@ -163,7 +163,7 @@ int main(int argc, char** argv){
 
 
 
-    MPI_Reduce(&local_sum, &global_sum, 1, MPI_FLOAT, MPI_SUM, 0,
+    MPI_Reduce(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
     // Print the result
