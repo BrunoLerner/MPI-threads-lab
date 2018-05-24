@@ -6,16 +6,20 @@
 #define size 16000
 #define nThreads 2
 
-typedef struct threads_args {
+struct thread_args {
     int index;
-} pthread_args;
+    int **matrix;
+};
 
-int sum[2], **matrix;
+int sum[2];
 
 void * partialSum (void *matrixAndIndex) {
-    pthread_args * args = (pthread_args *) matrixAndIndex;
+    struct thread_args * args = (struct thread_args *) matrixAndIndex;
     int index = args->index;
+    int **matrix= args->matrix;
     int columns = size/2, rows = size, start = 0;
+
+    printf("This is thread number %d calculating half of the matrix.\n", index);
 
     if(index == 1) {
         start = size/2;
@@ -33,8 +37,9 @@ void * partialSum (void *matrixAndIndex) {
     }
 }
 
-void getMatrix() {
+int** getMatrix() {
     // Alocando espaço pra matriz
+    int **matrix;
     matrix = malloc(size * sizeof(int *));
     
     if(matrix == NULL) {
@@ -78,29 +83,34 @@ void getMatrix() {
     //     i++;
     // }
     // fclose(matrixFile)
+
+    return matrix;
 }
 
 int main(){
-    getMatrix();
+    int **matrix;
+    matrix = getMatrix();
     
     time_t before, after;
     pthread_t threads[nThreads];
 
     before = time(NULL);
+    struct thread_args* matrixAndIndex;
     for(int i = 0; i < nThreads; i++) {
-        pthread_args matrixAndIndex;
-        matrixAndIndex.index = i;
-        pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
+        matrixAndIndex = malloc(sizeof(struct thread_args));
+        matrixAndIndex->index = i;
+        matrixAndIndex->matrix = matrix;
+        pthread_create(&threads[i], NULL, partialSum, (void *) matrixAndIndex);
     }
     
     for(int i = 0; i < nThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     
-    printf("The sum of the final Matrix is \n", sum[0] + sum[1]);
+    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1]);
     after = time(NULL);
 
-    printf("The time was %d seconds", after - before);
+    // printf("The time was %d seconds", int(after - before));
     free(matrix);
 
     return 0;

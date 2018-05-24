@@ -6,18 +6,19 @@
 #define size 16000
 #define nThreads 4
 
-typedef struct threads_args {
+struct thread_args {
     int index;
     int * diagonal;
-} pthread_args;
+};
 
 int sum[4], **matrix;
 
 void * partialSum (void *matrixAndIndex) {
-    pthread_args * args = (pthread_args *) matrixAndIndex;
+    struct thread_args * args = (struct thread_args *) matrixAndIndex;
     int index = args->index;
     int *diagonal = args->diagonal;
     int columns = size/4, rows = size/4, rowStart = 0, columnStart = 0;
+    printf("This is thread number %d calculating half of the matrix.\n", index);
 
     if(index == 1) {
         columnStart = size/4;
@@ -103,21 +104,22 @@ int main(){
     time_t before, after;
 
     before = time(NULL);
+    struct thread_args * matrixAndIndex;
     for(int i = 0; i < nThreads; i++) {
-        pthread_args matrixAndIndex;
-        matrixAndIndex.index = i;
-        matrixAndIndex.diagonal = diagonal;
-        pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
+        matrixAndIndex = malloc(sizeof(struct thread_args));
+        matrixAndIndex->index = i;
+        matrixAndIndex->diagonal = diagonal;
+        pthread_create(&threads[i], NULL, partialSum, (void *) matrixAndIndex);
     }
 
     for(int i = 0; i < nThreads; i++) {
         pthread_join(threads[i], NULL);
     }
     
-    printf("The sum of the final Matrix is \n", sum[0] + sum[1] + sum[2] + sum[3]);
+    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1] + sum[2] + sum[3]);
     after = time(NULL);
 
-    printf("The time was %d seconds", after - before);
+    // printf("The time was %d seconds", after - before);
 
     free(matrix);
     free(diagonal);
