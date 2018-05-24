@@ -31,12 +31,12 @@ void * partialSum (void *matrixAndIndex) {
 
     for (int i = rowStart; i < rowStart + rows; i++) {
         for (int j = columnStart; j < columnStart + columns; j++) {
-            matrix[rowStart + i/rows][columnStart + j%columns] *= diagonal[rowStart + i/rows];
+            matrix[i][j] *= diagonal[i];
         }
     }
     for (int i = rowStart; i < rowStart + rows; i++) {
         for (int j = columnStart; j < columnStart + columns; j++) {
-            sum[index] += matrix[rowStart + i/rows][columnStart + j%columns];
+            sum[index] += matrix[i][j];
         }
     }
     printf("Thread número %d calculou %d.\n", index, sum[index]);
