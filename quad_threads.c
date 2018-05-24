@@ -19,24 +19,23 @@ void * partialSum (void *matrixAndIndex) {
     int index = args->index;
     int *diagonal = args->diagonal;
     int **matrix = args->matrix;
-    int columns = size/4, rows = size/4, rowStart = 0, columnStart = 0;
+    int columns = size/2, rows = size/2, rowStart = 0, columnStart = 0;
     printf("Esse é o thread número %d calculando um quarto da matriz.\n", index);
 
-    if(index == 1) columnStart = size/4;   
-    else if (index == 2) rowStart = size/4;
+    if (index == 1) columnStart = size/2;   
+    else if (index == 2) rowStart = size/2;
     else if (index == 3) {
-        rowStart = size/4;
-        columnStart = size/4;
+        rowStart = size/2;
+        columnStart = size/2;
     }
 
-
-    for(int i = rowStart; i < rowStart + rows; i++) {
-        for(int j = columnStart; j < columnStart + columns; j++) {
+    for (int i = rowStart; i < rowStart + rows; i++) {
+        for (int j = columnStart; j < columnStart + columns; j++) {
             matrix[rowStart + i/rows][columnStart + j%columns] *= diagonal[rowStart + i/rows];
         }
     }
-    for(int i = rowStart; i < rowStart + rows; i++) {
-        for(int j = columnStart; j < columnStart + columns; j++) {
+    for (int i = rowStart; i < rowStart + rows; i++) {
+        for (int j = columnStart; j < columnStart + columns; j++) {
             sum[index] += matrix[rowStart + i/rows][columnStart + j%columns];
         }
     }
@@ -47,21 +46,21 @@ int ** getMatrix() {
     // Alocando espaço pra matriz
     int **matrix = malloc(size * sizeof(int *));
     
-    if(matrix == NULL) {
+    if (matrix == NULL) {
         printf("Out of memory\n");
         exit(1);
     }
 
-    for(int i = 0; i < size; i++) {
+    for (int i = 0; i < size; i++) {
         matrix[i] = malloc(size * sizeof(int));
-        if(matrix[i] == NULL) {
+        if (matrix[i] == NULL) {
             printf("Out of memory\n");
             exit(1);
         }
     }
     // Gerando a matriz aleatoriamente
-    for(int i = 0; i < size; i++) {
-        for(int j = 0; j < size; j++) {
+    for (int i = 0; i < size; i++) {
+        for (int j = 0; j < size; j++) {
             matrix[i][j] = rand() % 2;
         }
     }
