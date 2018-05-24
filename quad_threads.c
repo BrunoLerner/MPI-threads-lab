@@ -1,7 +1,8 @@
 #include<stdio.h>
-#include<string.h>
 #include<stdlib.h>
 #include<pthread.h>
+#include <time.h>
+
 #define size 16000
 #define nThreads 4
 
@@ -11,27 +12,35 @@ typedef struct threads_args {
     int * diagonal;
 } pthread_args;
 
-int sum[2];
+int sum[4];
 
 void * partialSum (void *matrixAndIndex) {
     pthread_args * args = (pthread_args *) matrixAndIndex;
     int index = args->index;
     int **matrix = args->matrix;
-    int columns = size/2, rows = size, start = 0;
+    int *diagonal = args->diagonal;
+    int columns = size/4, rows = size/4, rowStart = 0, columnStart = 0;
 
     if(index == 1) {
-        start = size/2;
+        columnStart = size/4;
     } 
+    else if (index == 2) {
+        rowStart = size/4;
+    }
+    else if (index == 3) {
+        rowStart = size/4;
+        columnStart = size/4;
+    }
 
 
     for(int i = 0; i < rows; i++) {
-        for(int j = start; j < columns; j++) {
-            matrix[i][j] *= matrix[i][i];
+        for(int j = 0; j < columns; j++) {
+            matrix[rowStart + i/rows][columnStart + j%columns] *= diagonal[rowStart + i/rows];
         }
     }
     for(int i = 0; i < rows; i++) {
-        for(int j = start; j < columns; j++) {
-            sum[index] += matrix[i][j];
+        for(int j = 0; j < columns; j++) {
+            sum[index] += matrix[rowStart + i/rows][columnStart + j%columns];
         }
     }
 }
@@ -88,12 +97,20 @@ int main(){
 
     pthread_t threads[nThreads];
 
+    int *diagonal;
+    diagonal = malloc(size * sizeof(int));
+
+    for(int i = 0; i < size ; i++) {
+        diagonal[i] = matrix[i][i];
+    }
+
     for(int i = 0; i < nThreads; i++) {
         pthread_args matrixAndIndex;
 
         matrixAndIndex.matrix = &matrix;
         matrixAndIndex.index = i;
-
+        matrixAndIndex.diagonal = diagonal;
+        
         pthread_create(threads[i], NULL, partialSum, (void *) &matrixAndIndex);
     }
 
@@ -101,8 +118,10 @@ int main(){
         pthread_join(threads[i], NULL);
     }
     
-    printf("The sum of the final Matrix is \n", sum[0] + sum[1]);
-
+    printf("The sum of the final Matrix is \n", sum[0] + sum[1] + sum[2] + sum[3]);
+    
+    free(matrix);
+    free(diagonal);
 
     return 0;
 }
