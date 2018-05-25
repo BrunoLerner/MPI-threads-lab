@@ -96,28 +96,35 @@ int main(int argc, char** argv){
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
         int **matrix = getMatrix(), i, j;
         int *matrixArray = matrixToArray(matrix);
-        MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
+        MPI_Send(&matrixArray[0], size * size, MPI_INT, 1, 0, MPI_COMM_WORLD);
         int columns = size, rows = size/2, start = 0;
-        printf("Esse é o nó %d calculando metade da matriz", myRank);
-        for(i = start; i < rows; i++) {
+        for(i = start; i < start + rows; i++) {
             for(j = 0; j < columns; j++) {
                 matrix[i][j] *= matrix[i][i];
                 localSum += matrix[i][j];
             }
         }      
+        printf("Nó %d diz: Aqui deu %d\n", myRank, localSum);
     }
     else if(myRank == 1) {
-        int *matrixArray = malloc(size*size* sizeof(int));
-        MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        int **matrix = arrayToMatrix(matrixArray), i, j;
+        int *matrixArray = malloc(size*size* sizeof(int)), i;
+        MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        printf("This is the matrix Im receiving\n");
+        for (i = 0; i < 10; i++) {
+            printf("%d ", matrixArray[i]);
+        }
+        printf("\n");
+        int **matrix = arrayToMatrix(matrixArray), j;
         int columns = size, rows = size/2, start = size/2;
 
-        for(i = start; i < rows; i++) {
+        for(i = start; i < start + rows; i++) {
             for(j = 0; j < columns; j++) {
                 matrix[i][j] *= matrix[i][i];
                 localSum += matrix[i][j];
             }
         }
+        printf("Nó %d diz: Aqui deu %d\n", myRank, localSum);
+
     }
 
     MPI_Reduce(&localSum, &globalSum, 1, MPI_INT, MPI_SUM, 0,
