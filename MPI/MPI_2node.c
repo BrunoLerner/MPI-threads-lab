@@ -63,7 +63,7 @@ int * matrixToArray(int **matrix) {
     return matrixArray;
 }
 
-int ** arrayToMatrix(int **matrixArray) {
+int ** arrayToMatrix(int *matrixArray) {
     int **matrix, i;
     matrix = malloc(size * sizeof(int *));
     
@@ -95,7 +95,7 @@ int main(int argc, char** argv){
     if(myRank == 0) {
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
         int **matrix = getMatrix(), i, j;
-        int *matrixArray = matrixToArray(&matrix);
+        int *matrixArray = matrixToArray(matrix);
         MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
         int columns = size, rows = size/2, start = 0;
         printf("Esse é o nó %d calculando metade da matriz", myRank);
@@ -109,7 +109,7 @@ int main(int argc, char** argv){
     else if(myRank == 1) {
         int *matrixArray = malloc(size*size* sizeof(int));
         MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        int **matrix = arrayToMatrix(&matrixArray), i, j;
+        int **matrix = arrayToMatrix(matrixArray), i, j;
         int columns = size, rows = size/2, start = size/2;
 
         for(i = start; i < rows; i++) {
@@ -120,12 +120,12 @@ int main(int argc, char** argv){
         }
     }
 
-    MPI_Reduce(&local_sum, &global_sum, 1, MPI_INT, MPI_SUM, 0,
+    MPI_Reduce(&localSum, &globalSum, 1, MPI_INT, MPI_SUM, 0,
              MPI_COMM_WORLD);
 
     // Print the result
     if (myRank == 0) {
-        printf("A soma dos elementos da matriz resultante é = %d\n", global_sum));
+        printf("A soma dos elementos da matriz resultante é = %d\n", globalSum);
     }
 
     
