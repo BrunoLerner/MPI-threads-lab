@@ -127,7 +127,6 @@ int main(int argc, char** argv){
     if (myRank == 0) {
         printf("A soma dos elementos da matriz resultante é = %d\n", globalSum);
     }
-
     
     MPI_Finalize();
     return 0;
