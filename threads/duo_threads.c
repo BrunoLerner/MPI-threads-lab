@@ -21,8 +21,6 @@ void * partialSum (void *matrixAndIndex) {
     int **matrix= args->matrix;
     int columns = size/2, rows = size, start = 0;
 
-    printf("Esse é o thread número %d calculando uma metade da matriz.\n", index);
-
     if(index == 1) start = size/2;
 
     for(int i = 0; i < rows; i++) {
@@ -31,6 +29,7 @@ void * partialSum (void *matrixAndIndex) {
             sum[index] += matrix[i][j];
         }
     }
+    printf("Thread %d diz: Aqui deu %d.\n", index, sum[index]);
 }
 
 int** getMatrix() {
@@ -55,29 +54,6 @@ int** getMatrix() {
             matrix[i][j] = rand() % 2;
         }
     }
-    
-    // Lendo a matriz de um arquivo
-
-    // FILE *matrixFile = fopen("matrix.txt","r");
-    // if(matrixFile == NULL) {
-    //     printf("file could not be opened");
-    //     exit(1);
-    // }
-
-    // i=0;
-    // while(!feof(matrixFile)) {
-    //     char temp[size], *token;
-    //     fscanf(matrixFile, "%s", temp);
-    //     token = strtok(temp, ",");
-    //     j=0;
-    //     while(token != NULL) {
-    //         matrix[i][j] = atoi(token);
-    //         token = strtok(NULL, ",");
-    //         j++;
-    //     }
-    //     i++;
-    // }
-    // fclose(matrixFile)
 
     return matrix;
 }
@@ -103,9 +79,7 @@ int main(){
     gettimeofday(&endTime, NULL);
     double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
 
-    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1]);
-
-    printf("The time was %lf seconds.\n", time/1000000.0);
+    printf("O resultado da soma total é %d \n O tempo foi %lf\n", sum[0] + sum[1], time/1000000.0);
     free(matrix);
 
     return 0;
