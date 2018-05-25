@@ -83,10 +83,10 @@ int** getMatrix() {
 int main(){
     int **matrix = getMatrix();
     
-    time_t before, after;
+    struct timeval startTime, endTime;
     pthread_t threads[nThreads];
 
-    before = time(NULL);
+    gettimeofday(&startTime, NULL);
     struct thread_args* matrixAndIndex;
     for(int i = 0; i < nThreads; i++) {
         matrixAndIndex = malloc(sizeof(struct thread_args));
@@ -98,13 +98,13 @@ int main(){
     for(int i = 0; i < nThreads; i++) {
         pthread_join(threads[i], NULL);
     }
-    
-    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1]);
-    after = time(NULL);
+    gettimeofday(&endTime, NULL);
+    double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
 
-    // printf("The time was %d seconds", int(after - before));
+    printf("The sum of the final Matrix is %d \n", sum[0] + sum[1]);
+
+    printf("The time was %d seconds", time/1000000.0);
     free(matrix);
 
     return 0;
-}
- 
+} 
