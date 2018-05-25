@@ -56,6 +56,7 @@ int ** getMatrix() {
 
 int * matrixToArray(int **matrix) {
     int *matrixArray, i;
+    matrix = malloc(size*size* sizeof(int));
     for(i = 0; i < size*size; i++) {
         matrixArray[i] = matrix[i/size][i%size];
     }
@@ -64,6 +65,21 @@ int * matrixToArray(int **matrix) {
 
 int ** arrayToMatrix(int **matrixArray) {
     int **matrix, i;
+    matrix = malloc(size * sizeof(int *));
+    
+    if(matrix == NULL) {
+        printf("Out of memory\n");
+        exit(1);
+    }
+
+    for(i = 0; i < size; i++) {
+        matrix[i] = malloc(size * sizeof(int));
+        if(matrix[i] == NULL) {
+            printf("Out of memory\n");
+            exit(1);
+        }
+    }
+    
     for(i = 0; i < size*size; i++) {
         matrix[i/size][i%size] = matrixArray[i];
     }
