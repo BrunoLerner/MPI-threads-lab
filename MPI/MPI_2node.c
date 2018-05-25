@@ -28,29 +28,7 @@ int ** getMatrix() {
             matrix[i][j] = rand() % 2;
         }
     }
-    
-    // Lendo a matriz de um arquivo
 
-    // FILE *matrixFile = fopen("matrix.txt","r");
-    // if(matrixFile == NULL) {
-    //     printf("file could not be opened");
-    //     exit(1);
-    // }
-
-    // i=0;
-    // while(!feof(matrixFile)) {
-    //     char temp[size], *token;
-    //     fscanf(matrixFile, "%s", temp);
-    //     token = strtok(temp, ",");
-    //     j=0;
-    //     while(token != NULL) {
-    //         matrix[i][j] = atoi(token);
-    //         token = strtok(NULL, ",");
-    //         j++;
-    //     }
-    //     i++;
-    // }
-    // fclose(matrixFile)
     return matrix;
 }
 
@@ -109,11 +87,6 @@ int main(int argc, char** argv){
     else if(myRank == 1) {
         int *matrixArray = malloc(size*size* sizeof(int)), i;
         MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        printf("This is the matrix Im receiving\n");
-        for (i = 0; i < 10; i++) {
-            printf("%d ", matrixArray[i]);
-        }
-        printf("\n");
         int **matrix = arrayToMatrix(matrixArray), j;
         int columns = size, rows = size/2, start = size/2;
 

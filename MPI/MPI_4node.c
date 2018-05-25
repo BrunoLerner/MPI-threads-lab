@@ -56,7 +56,7 @@ int ** getMatrix() {
 
 int * matrixToArray(int **matrix) {
     int *matrixArray, i;
-    matrix = malloc(size*size* sizeof(int));
+    matrixArray = malloc(size*size* sizeof(int));
     for(i = 0; i < size*size; i++) {
         matrixArray[i] = matrix[i/size][i%size];
     }
@@ -85,6 +85,7 @@ int ** arrayToMatrix(int *matrixArray) {
     }
     return matrix;
 }
+
 
 
 int main(int argc, char** argv){
