@@ -1,8 +1,7 @@
 # MPI-threads-lab
 Versions of a program that realize some operations in a matrix. Using MPI and threads in different ways and doing a benchmark.
-``` 
-#define matrix_size 16000
-```
+`#define matrix_size 16000`
+
 ## Approaches 
 `duo_thread.c` - single node with 2 threads sharing the task.
 `quad_thread.c` - single node with 4 threads sharing the task.
