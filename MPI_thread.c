@@ -22,7 +22,6 @@ void * partialSum (void *matrixAndIndex) {
     int **matrix = args->matrix;
     int *diagonal = args->diagonal;
     int columns = size/2, rows = size/2, rowStart = 0, columnStart = 0;
-    printf("Esse é o thread %d do processador %d calculando uma metade da matriz.\n", index, procRank);
 
     if (procRank == 0 && index == 1) columnStart = size/2;
     else if (procRank == 1 && index == 0) rowStart = size/2;
@@ -37,6 +36,8 @@ void * partialSum (void *matrixAndIndex) {
             sum[index] += matrix[i][j];
         }
     }
+
+    printf("Esse é o thread %d do processador %d calculando uma metade da matriz.\n O resultado parcial dessa thread foi %d", index, procRank, sum[index]);
 }
 
 int ** getMatrix() {
@@ -67,8 +68,8 @@ int ** getMatrix() {
 
 int * matrixToArray(int **matrix) {
     int *matrixArray, i;
-    matrix = malloc(size*size* sizeof(int));
-    for(i = 0; i < size*size; i++) {
+    matrixArray = malloc(size*size* sizeof(int));
+    for (i = 0; i < size*size; i++) {
         matrixArray[i] = matrix[i/size][i%size];
     }
     return matrixArray;
@@ -78,12 +79,12 @@ int ** arrayToMatrix(int *matrixArray) {
     int **matrix, i;
     matrix = malloc(size * sizeof(int *));
     
-    if(matrix == NULL) {
+    if (matrix == NULL) {
         printf("Out of memory\n");
         exit(1);
     }
 
-    for(i = 0; i < size; i++) {
+    for (i = 0; i < size; i++) {
         matrix[i] = malloc(size * sizeof(int));
         if(matrix[i] == NULL) {
             printf("Out of memory\n");
@@ -91,7 +92,7 @@ int ** arrayToMatrix(int *matrixArray) {
         }
     }
 
-    for(i = 0; i < size*size; i++) {
+    for (i = 0; i < size*size; i++) {
         matrix[i/size][i%size] = matrixArray[i];
     }
     return matrix;
@@ -100,15 +101,14 @@ int ** arrayToMatrix(int *matrixArray) {
 int main(int argc, char** argv){
     MPI_Init(&argc, &argv);
 
-    int localSum = 0, globalSum, myRank;
+    int localSum = 0, globalSum = 0, myRank;
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
 
     if (myRank == 0) {
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
-        int **matrix = getMatrix();
-        int *matrixArray = matrixToArray(&matrix);
-        MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
-        printf("Esse é o nó %d calculando metade da matriz", myRank);
+        int **matrix = getMatrix(), i, j;
+        int *matrixArray = matrixToArray(matrix);
+        MPI_Send(&matrixArray[0], size * size, MPI_INT, 1, 0, MPI_COMM_WORLD);
 
         struct thread_args* matrixAndIndex;
         int *diagonal = malloc(size * sizeof(int));
@@ -133,13 +133,11 @@ int main(int argc, char** argv){
         localSum = sum[0] + sum[1];
     }
     else if (myRank == 1) {
-        matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
-        MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-        int **matrix = arrayToMatrix(&matrixArray);
-        printf("Esse é o nó %d calculando metade da matriz", myRank);
-
-        struct thread_args* matrixAndIndex;
+        int *matrixArray = malloc(size * size * sizeof(int)), i, j;
+        MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
+        int **matrix = arrayToMatrix(matrixArray);
         int *diagonal = malloc(size * sizeof(int));
+        struct thread_args* matrixAndIndex;
 
         for (int i = 0; i < size ; i++) {
             diagonal[i] = matrix[i][i];
