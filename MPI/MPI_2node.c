@@ -85,7 +85,7 @@ int main(int argc, char** argv){
         printf("Nó %d diz: Aqui deu %d\n", myRank, localSum);
     }
     else if(myRank == 1) {
-        int *matrixArray = malloc(size*size* sizeof(int)), i;
+        int *matrixArray = malloc(size * size * sizeof(int)), i;
         MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(matrixArray), j;
         int columns = size, rows = size/2, start = size/2;
