@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<pthread.h>
 #include <time.h>
+#include <sys/time.h>
+
 
 #define size 16000
 #define nThreads 2
@@ -103,7 +105,7 @@ int main(){
 
     printf("The sum of the final Matrix is %d \n", sum[0] + sum[1]);
 
-    printf("The time was %d seconds", time/1000000.0);
+    printf("The time was %lf seconds.\n", time/1000000.0);
     free(matrix);
 
     return 0;
