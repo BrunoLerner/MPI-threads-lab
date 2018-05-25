@@ -79,7 +79,7 @@ int ** arrayToMatrix(int **matrixArray) {
             exit(1);
         }
     }
-    
+
     for(i = 0; i < size*size; i++) {
         matrix[i/size][i%size] = matrixArray[i];
     }
@@ -107,7 +107,7 @@ int main(int argc, char** argv){
         }      
     }
     else if(myRank == 1) {
-        matrixArray = (int*) malloc((SIZE/2)*sizeof(int));
+        int *matrixArray = malloc(size*size* sizeof(int));
         MPI_Recv(&matrixArray, 1, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(&matrixArray), i, j;
         int columns = size, rows = size/2, start = size/2;
