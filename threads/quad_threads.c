@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<pthread.h>
 #include <time.h>
+#include <sys/time.h>
 
 #define size 16000
 #define nThreads 4
@@ -20,7 +21,6 @@ void * partialSum (void *matrixAndIndex) {
     int *diagonal = args->diagonal;
     int **matrix = args->matrix;
     int columns = size/2, rows = size/2, rowStart = 0, columnStart = 0;
-    printf("Esse é o thread número %d calculando um quarto da matriz.\n", index);
 
     if (index == 1) columnStart = size/2;   
     else if (index == 2) rowStart = size/2;
@@ -35,7 +35,7 @@ void * partialSum (void *matrixAndIndex) {
             sum[index] += matrix[i][j];
         }
     }
-    printf("Thread número %d calculou %d.\n", index, sum[index]);
+    printf("Thread %d diz: Aqui deu %d.\n", index, sum[index]);
 }
 
 int ** getMatrix() {
@@ -60,29 +60,7 @@ int ** getMatrix() {
             matrix[i][j] = rand() % 2;
         }
     }
-    
-    // Lendo a matriz de um arquivo
 
-    // FILE *matrixFile = fopen("matrix.txt","r");
-    // if(matrixFile == NULL) {
-    //     printf("file could not be opened");
-    //     exit(1);
-    // }
-
-    // i=0;
-    // while(!feof(matrixFile)) {
-    //     char temp[size], *token;
-    //     fscanf(matrixFile, "%s", temp);
-    //     token = strtok(temp, ",");
-    //     j=0;
-    //     while(token != NULL) {
-    //         matrix[i][j] = atoi(token);
-    //         token = strtok(NULL, ",");
-    //         j++;
-    //     }
-    //     i++;
-    // }
-    // fclose(matrixFile)
     return matrix;
 }
 
@@ -115,9 +93,7 @@ int main(){
     gettimeofday(&endTime, NULL);
     double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
     
-    printf("A soma da matriz final é %d \n", sum[0] + sum[1] + sum[2] + sum[3]);
-
-    printf("The time was %d seconds", time/1000000.0);
+    printf("O resultado da soma total é %d \n O tempo foi %lf \n", sum[0] + sum[1] + sum[2] + sum[3], time/1000000.0);
 
     free(matrix);
     free(diagonal);
