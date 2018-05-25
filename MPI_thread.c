@@ -82,6 +82,9 @@ int ** arrayToMatrix(int **matrixArray) {
 }
 
 int main(int argc, char** argv){
+    
+    struct timeval startTime, endTime;
+    
     MPI_Init(&argc, &argv);
 
     int localSum = 0, globalSum, myRank;
@@ -91,6 +94,8 @@ int main(int argc, char** argv){
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
         int **matrix = getMatrix();
         int *matrixArray = matrixToArray(&matrix);
+        
+        gettimeofday(&startTime, NULL);
         MPI_Send(&matrixArray, 1, MPI_INT, 1, 0, MPI_COMM_WORLD);
         printf("Esse é o nó %d calculando metade da matriz", myRank);
 
@@ -150,7 +155,11 @@ int main(int argc, char** argv){
 
     // Print the result
     if (myRank == 0) {
-        printf("A soma dos elementos da matriz resultante é = %d\n", global_sum));
+        
+        gettimeofday(&endTime, NULL);
+        double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
+        
+        printf("A soma dos elementos da matriz resultante é = %d\n, tempo é = %d", global_sum, time/1000000.0));
     }
 
     
