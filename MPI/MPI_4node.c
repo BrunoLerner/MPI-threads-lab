@@ -72,7 +72,6 @@ int main(int argc, char** argv){
 
     int localSum = 0, globalSum, myRank, columns = size/2, rows = size/2;
     MPI_Comm_rank(MPI_COMM_WORLD, &myRank);
-    printf("%d\n",myRank);
 
     if (myRank == 0) {
         // O objetivo desse nó é pegar a matriz e distribuir pro resto
@@ -82,7 +81,8 @@ int main(int argc, char** argv){
 
         gettimeofday(&startTime, NULL);
         MPI_Send(&matrixArray[0], size * size, MPI_INT, 1, 0, MPI_COMM_WORLD);
-        
+        MPI_Send(&matrixArray[0], size * size, MPI_INT, 2, 0, MPI_COMM_WORLD);
+        MPI_Send(&matrixArray[0], size * size, MPI_INT, 3, 0, MPI_COMM_WORLD);
         for (i = rowStart; i < rowStart + rows; i++) {
             for (j = columnStart; j < columnStart + columns; j++) {
                 matrix[i][j] *= matrix[i][i];
@@ -112,7 +112,6 @@ int main(int argc, char** argv){
         printf("Nó %d diz: O resultado parcial aqui deu %d\n", myRank, localSum);
     }
     else if (myRank == 2) {
-        printf("Nó %d rodano", myRank);
         int *matrixArray = malloc(size * size * sizeof(int)), i, j;
         MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(matrixArray);
@@ -134,7 +133,6 @@ int main(int argc, char** argv){
 
     }
     else if (myRank == 3) {
-        printf("Nó %d rodano", myRank);
         int *matrixArray = malloc(size * size * sizeof(int)), i, j;
         MPI_Recv(matrixArray, size * size, MPI_INT, 0, 0, MPI_COMM_WORLD, MPI_STATUS_IGNORE);
         int **matrix = arrayToMatrix(matrixArray);
