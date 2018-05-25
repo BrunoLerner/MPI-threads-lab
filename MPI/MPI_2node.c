@@ -114,7 +114,7 @@ int main(int argc, char** argv){
         gettimeofday(&endTime, NULL);
         double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
         
-        printf("A soma dos elementos da matriz resultante é = %d\n O tempo é = %d\n", global_sum, time/1000000.0));
+        printf("A soma dos elementos da matriz resultante é = %d\n O tempo foi = %lf segundos\n", globalSum, time/1000000.0);
 
     }
     
