@@ -95,9 +95,9 @@ int main(){
     for(int i = 0; i < size ; i++) {
         diagonal[i] = matrix[i][i];
     }
-    time_t before, after;
+    struct timeval startTime, endTime;
 
-    before = time(NULL);
+    gettimeofday(&startTime, NULL);
 
     struct thread_args * matrixAndIndex;
     for(int i = 0; i < nThreads; i++) {
@@ -112,10 +112,12 @@ int main(){
         pthread_join(threads[i], NULL);
     }
     
+    gettimeofday(&endTime, NULL);
+    double time = (endTime.tv_sec*1000000 + endTime.tv_usec) - (startTime.tv_sec*1000000 +  startTime.tv_usec);
+    
     printf("A soma da matriz final é %d \n", sum[0] + sum[1] + sum[2] + sum[3]);
-    after = time(NULL);
 
-    // printf("The time was %d seconds", after - before);
+    printf("The time was %d seconds", time/1000000.0);
 
     free(matrix);
     free(diagonal);
