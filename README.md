@@ -12,3 +12,5 @@ Versions of a program that realizes some operation in a matrix and adding it.
 `MPI_Thread.c` - 2 nodes with 2 threads sharing the task in each node.<br/>
 
 ## Benchmarking
+
+![alt tag](benchmark.png)
