@@ -1,5 +1,5 @@
 # MPI-threads-lab
-Versions of a program that realizes some operation in a matrix and adding it.
+Versions of a program that makes some operation in a matrix and adding it.
 `#define matrix_size 16000`
 
 ## Approaches 
