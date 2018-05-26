@@ -17,4 +17,4 @@ Versions of a program that makes some operation in a matrix and adding it.
 
 ## Conclusion
 The results are not intuitive, because I wouldn't imagine that using 2 nodes with 2 threads on each would take more time than just using 2 nodes single threaded. But thinking further, We've noticed that the operations are way to easy to compute that the overhead created by the 2 threads take the longest space of time.
-
+Interesting article on that : http://www.thequestforoptimality.com/using-more-processors-does-not-necessarily-lead-to-reduced-run-times-on-cplex/
